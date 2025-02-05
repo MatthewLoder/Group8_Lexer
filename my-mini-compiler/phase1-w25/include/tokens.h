@@ -14,10 +14,16 @@
  * - More operators
  * - Delimiters
  */
-typedef enum {
+typedef enum
+{
   TOKEN_EOF,
-  TOKEN_NUMBER,   // e.g., "123", "456"
-  TOKEN_OPERATOR, // e.g., "+", "-"
+  TOKEN_NUMBER,     // e.g., "123", "456"
+  TOKEN_OPERATOR,   // e.g., "+", "-"
+  TOKEN_KEYWORD,    // e.g., "if", "until"
+  TOKEN_IDENTIFIER, // e.g., "x"
+  TOKEN_STRING,     // e.g., ""Hello World""
+  TOKEN_DELIMITER,  // e.g., "()", "{}"
+  TOKEN_COMMENT,    // e.g., "// comment", "/* comment */"
   TOKEN_ERROR
 } TokenType;
 
@@ -25,11 +31,14 @@ typedef enum {
  * TODO: Add more error types as needed for your language - as much as you like
  * !!
  */
-typedef enum {
+typedef enum
+{
   ERROR_NONE,
   ERROR_INVALID_CHAR,
   ERROR_INVALID_NUMBER,
-  ERROR_CONSECUTIVE_OPERATORS
+  ERROR_CONSECUTIVE_OPERATORS,
+  ERROR_UNTERMINATED_STRING,
+  ERROR_UNEXPECTED_CHARACTER
 } ErrorType;
 
 /* Token structure to store token information
@@ -38,7 +47,8 @@ typedef enum {
  * to debug your lexer properly. Don't forget to update the token fields in
  * lexer.c as well
  */
-typedef struct {
+typedef struct
+{
   TokenType type;
   char lexeme[100]; // Actual text of the token
   int line;         // Line number in source file
