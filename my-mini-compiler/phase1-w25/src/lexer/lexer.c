@@ -10,11 +10,9 @@ static int current_line = 1;
 static char last_token_type = 'x'; // For checking consecutive operators
 
 /* Print error messages for lexical errors */
-void print_error(ErrorType error, int line, const char *lexeme)
-{
+void print_error(ErrorType error, int line, const char *lexeme) {
   printf("Lexical Error at line %d: ", line);
-  switch (error)
-  {
+  switch (error) {
   case ERROR_INVALID_CHAR:
     printf("Invalid character '%s'\n", lexeme);
     break;
@@ -37,17 +35,14 @@ void print_error(ErrorType error, int line, const char *lexeme)
  *  TODO Update your printing function accordingly
  */
 
-void print_token(Token token)
-{
-  if (token.error != ERROR_NONE)
-  {
+void print_token(Token token) {
+  if (token.error != ERROR_NONE) {
     print_error(token.error, token.line, token.lexeme);
     return;
   }
 
   printf("Token: ");
-  switch (token.type)
-  {
+  switch (token.type) {
   case TOKEN_NUMBER:
     printf("NUMBER");
     break;
@@ -79,23 +74,19 @@ void print_token(Token token)
 }
 
 /* Get next token from input */
-Token get_next_token(const char *input, int *pos)
-{
+Token get_next_token(const char *input, int *pos) {
   Token token = {TOKEN_ERROR, "", current_line, ERROR_NONE};
   char c;
 
   // Skip whitespace and track line numbers
-  while ((c = input[*pos]) != '\0' && (c == ' ' || c == '\n' || c == '\t'))
-  {
-    if (c == '\n')
-    {
+  while ((c = input[*pos]) != '\0' && (c == ' ' || c == '\n' || c == '\t')) {
+    if (c == '\n') {
       current_line++;
     }
     (*pos)++;
   }
 
-  if (input[*pos] == '\0')
-  {
+  if (input[*pos] == '\0') {
     token.type = TOKEN_EOF;
     strcpy(token.lexeme, "EOF");
     return token;
@@ -105,9 +96,11 @@ Token get_next_token(const char *input, int *pos)
 
   // TODO: Add comment handling here
   // Single-Line Comments
-  if (c == '/' && input[*pos + 1] == '/') // check if the first 2 characters are //
+  if (c == '/' &&
+      input[*pos + 1] == '/') // check if the first 2 characters are //
   {
-    while (input[*pos] != '\n' && input[*pos] != '\0') // until we find a new line character,
+    while (input[*pos] != '\n' &&
+           input[*pos] != '\0') // until we find a new line character,
     {
       (*pos)++; // keep skipping contents
     }
@@ -118,7 +111,9 @@ Token get_next_token(const char *input, int *pos)
   if (c == '/' && input[*pos + 1] == '*') // check ig first 2 characters are /*
   {
     (*pos) += 2;
-    while (input[*pos] != '\0' && !(input[*pos] == '*' && input[*pos + 1] == '/')) // until we find the closing */
+    while (input[*pos] != '\0' &&
+           !(input[*pos] == '*' &&
+             input[*pos + 1] == '/')) // until we find the closing */
     {
       if (input[*pos] == '\n')
         current_line++; // keep skipping contents
@@ -131,11 +126,9 @@ Token get_next_token(const char *input, int *pos)
   }
 
   // Handle numbers
-  if (isdigit(c))
-  {
+  if (isdigit(c)) {
     int i = 0;
-    do
-    {
+    do {
       token.lexeme[i++] = c;
       (*pos)++;
       c = input[*pos];
@@ -148,15 +141,15 @@ Token get_next_token(const char *input, int *pos)
 
   // TODO: Add keyword and identifier handling here
   // check if starts with a letter or underscore
-  if (isalpha(c) || c == '_')
-  {
+  if (isalpha(c) || c == '_') {
     int i = 0;
-    do
-    {
+    do {
       token.lexeme[i++] = c;
       (*pos)++;
       c = input[*pos];
-    } while ((isalnum(c) || c == '_') && i < sizeof(token.lexeme) - 1); // keep going as long as we're still finding letters or underscores
+    } while ((isalnum(c) || c == '_') &&
+             i < sizeof(token.lexeme) - 1); // keep going as long as we're still
+                                            // finding letters or underscores
 
     token.lexeme[i] = '\0';
 
@@ -166,15 +159,11 @@ Token get_next_token(const char *input, int *pos)
         strcmp(token.lexeme, "until") == 0 ||
         strcmp(token.lexeme, "else") == 0 ||
         strcmp(token.lexeme, "while") == 0 ||
-        strcmp(token.lexeme, "for") == 0 ||
-        strcmp(token.lexeme, "do") == 0 ||
+        strcmp(token.lexeme, "for") == 0 || strcmp(token.lexeme, "do") == 0 ||
         strcmp(token.lexeme, "return") == 0 ||
-        strcmp(token.lexeme, "int") == 0)
-    {
+        strcmp(token.lexeme, "int") == 0) {
       token.type = TOKEN_KEYWORD;
-    }
-    else
-    {
+    } else {
       token.type = TOKEN_IDENTIFIER;
     }
 
@@ -182,12 +171,21 @@ Token get_next_token(const char *input, int *pos)
   }
 
   // TODO: Add string literal handling here
+  if (c == '\"') {
+    int i = 0;
+    do {
+      token.lexeme[i++] = c;
+      (*pos)++;
+      c = input[*pos];
+    } while (c != '\"');
+    token.lexeme[i] = '\0';
+    token.type = TOKEN_STRING;
+    return token;
+  }
 
   // Handle operators
-  if (c == '+' || c == '-')
-  {
-    if (last_token_type == 'o')
-    {
+  if (c == '+' || c == '-') {
+    if (last_token_type == 'o') {
       // Check for consecutive operators
       token.error = ERROR_CONSECUTIVE_OPERATORS;
       token.lexeme[0] = c;
@@ -217,20 +215,21 @@ Token get_next_token(const char *input, int *pos)
 // operators (+ and -), consecutive operator errors, whitespace and newlines,
 // with simple line tracking for error reporting.
 
-int main()
-{
-  // const char *input = "123 + 456 - 789\n1 ++ 2"; // Test with multi-line input
+int main() {
+  // const char *input = "123 + 456 - 789\n1 ++ 2"; // Test with multi-line
+  // input
 
   // Test comments, keywords, identifiers
-  const char *input = "// This is a comment \n /* Multi-line \n comment */ int x";
+  // const char *input =
+  //"// This is a comment \n /* Multi-line \n comment */ int x";
+  const char *input = "\"this is a test\"";
 
   int position = 0;
   Token token;
 
   printf("Analyzing input:\n%s\n\n", input);
 
-  do
-  {
+  do {
     token = get_next_token(input, &position);
     print_token(token);
   } while (token.type != TOKEN_EOF);
