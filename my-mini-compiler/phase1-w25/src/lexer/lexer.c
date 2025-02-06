@@ -86,6 +86,7 @@ Token get_next_token(const char *input, int *pos) {
     (*pos)++;
   }
 
+  // create eof token
   if (input[*pos] == '\0') {
     token.type = TOKEN_EOF;
     strcpy(token.lexeme, "EOF");
@@ -107,6 +108,7 @@ Token get_next_token(const char *input, int *pos) {
     last_token_type = 'C'; // Mark as comment
     return get_next_token(input, pos);
   }
+
   // Multi-Line Comments
   if (c == '/' && input[*pos + 1] == '*') // check ig first 2 characters are /*
   {
@@ -170,15 +172,24 @@ Token get_next_token(const char *input, int *pos) {
     return token;
   }
 
+  int y = 1;
+
   // TODO: Add string literal handling here
   if (c == '\"') {
     int i = 0;
+
     do {
       token.lexeme[i++] = c;
       (*pos)++;
       c = input[*pos];
     } while (c != '\"');
+
+    token.lexeme[i++] = c;
+    (*pos)++;
+    c = input[*pos];
+
     token.lexeme[i] = '\0';
+
     token.type = TOKEN_STRING;
     return token;
   }
@@ -229,9 +240,13 @@ int main() {
 
   printf("Analyzing input:\n%s\n\n", input);
 
+  int i = 0;
+
   do {
     token = get_next_token(input, &position);
     print_token(token);
+    printf("%d\n", i++);
+    // return 0;
   } while (token.type != TOKEN_EOF);
 
   return 0;
