@@ -220,11 +220,12 @@ Token get_next_token(const char *input, int *pos) {
         strcmp(token.lexeme, "until") == 0 ||
         strcmp(token.lexeme, "else") == 0 ||
         strcmp(token.lexeme, "while") == 0 ||
-        strcmp(token.lexeme, "for") == 0 || strcmp(token.lexeme, "do") == 0 ||
+        strcmp(token.lexeme, "for") == 0 || 
+        strcmp(token.lexeme, "do") == 0 ||
         strcmp(token.lexeme, "return") == 0 ||
-        strcmp(token.lexeme, "int") == 0) {
+        strcmp(token.lexeme, "int\0") == 0) {
       token.type = TOKEN_KEYWORD;
-      token.type = last_token_type = 'k';
+      last_token_type = 'k';
     } else {
       token.type = TOKEN_IDENTIFIER;
       last_token_type = 'i';
