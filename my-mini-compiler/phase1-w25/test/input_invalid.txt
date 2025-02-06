@@ -1,2 +1,27 @@
-123a456;
-test
+4xi
+
+/*
+This is a test comment
+This is another test comment
+*/
+
+int main () {
+    //invalid number value error
+    int var1 = 1000000000000;
+
+    //added invalid number format error
+    123a456
+
+    //added consecutive operator error
+    +-
+
+    //unterminated string error
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+    //added invalid character error
+    ~
+
+    //error identifier too long
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    
+}
