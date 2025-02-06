@@ -176,9 +176,9 @@ Token get_next_token(const char *input, int *pos) {
         c = input[*pos];
         
         //check for invalid character in number
-        if (!isdigit(c) && c != '\n' && c != ';' && c != '\t'  && c != ' ' && c != '\0' && c != '+' && c != '-' && c != '*' && c != '/' && c != '&' && c != '|' && c != '%' && c != '=') token.error = ERROR_INVALID_NUMBER_FORMAT;
+        if (!isdigit(c) && c != '\n' && c != ';' && c != '\t'  && c != ' ' && c != '\0' && c != '+' && c != '-' && c != '*' && c != '/' && c != '&' && c != '|' && c != '%' && c != '=' && c != ')' && c != '(' && c != '}' && c != '{') token.error = ERROR_INVALID_NUMBER_FORMAT;
 
-      } while (((token.error == ERROR_NONE && isdigit(c)) || (token.error == ERROR_INVALID_NUMBER_FORMAT && c != '\n' && c != ';' && c != '\t' && c != ' ' && c != '+' && c != '-' && c != '*' && c != '/' && c != '&' && c != '|' && c != '%' && c != '=')) && i < sizeof(token.lexeme) - 1);
+      } while (((token.error == ERROR_NONE && isdigit(c)) || (token.error == ERROR_INVALID_NUMBER_FORMAT && c != '\n' && c != ';' && c != '\t' && c != ' ' && c != '+' && c != '-' && c != '*' && c != '/' && c != '&' && c != '|' && c != '%' && c != '=' && c != ')' && c != '(' && c != '}' && c != '{')) && i < sizeof(token.lexeme) - 1);
 
       token.lexeme[i] = '\0';
 
