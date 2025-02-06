@@ -85,7 +85,7 @@ Token get_next_token(const char *input, int *pos) {
   char c;
 
   // Skip whitespace and track line numbers
-  while ((c = input[*pos]) != '\0' && (c == ' ' || c == '\n' || c == '\t')) {
+  while (((c = input[*pos]) != '\0') && (c == ' ' || c == '\n' || c == '\t')) {
     if (c == '\n') {
       current_line++;
     }
@@ -96,6 +96,7 @@ Token get_next_token(const char *input, int *pos) {
   if (input[*pos] == '\0') {
     token.type = TOKEN_EOF;
     strcpy(token.lexeme, "EOF");
+    token.line = current_line;
     return token;
   }
 
@@ -116,6 +117,7 @@ Token get_next_token(const char *input, int *pos) {
     token.lexeme[i] = '\0';
     token.type = TOKEN_COMMENT;
     last_token_type = 'c';
+    token.line = current_line;
     return token;
   }
 
@@ -129,8 +131,15 @@ Token get_next_token(const char *input, int *pos) {
     token.lexeme[i++] = c;
     (*pos)++;
 
+    if (c == '\n') {
+      current_line++;
+    }
+
     do {
       c = input[*pos];
+      if (c == '\n') {
+        current_line++;
+      }
 
       if (i < sizeof(token.lexeme) - 1) {
         token.lexeme[i++] = c;
@@ -154,6 +163,7 @@ Token get_next_token(const char *input, int *pos) {
 
     token.type = TOKEN_COMMENT;
     last_token_type = 'c';
+    token.line = current_line;
 
     return token;
   }
@@ -193,6 +203,7 @@ Token get_next_token(const char *input, int *pos) {
       
       token.type = TOKEN_NUMBER;
       last_token_type = 'n';
+      token.line = current_line;
       return token;
     }
   }
@@ -231,6 +242,7 @@ Token get_next_token(const char *input, int *pos) {
       last_token_type = 'i';
     }
 
+    token.line = current_line;
     return token;
   }
 
@@ -244,7 +256,7 @@ Token get_next_token(const char *input, int *pos) {
       c = input[*pos];
       
       //adjust for extra quotation, max string length is 98 + 2 quotations
-      if (i > sizeof(token.lexeme) - 2 || c == '\0') {
+      if (i > sizeof(token.lexeme) - 2 || c == '\0' || c == '\n') {
         token.error = ERROR_UNTERMINATED_STRING;
         *(pos)--;
         break;
@@ -260,6 +272,7 @@ Token get_next_token(const char *input, int *pos) {
     token.lexeme[i] = '\0';
     token.type = TOKEN_STRING;
     last_token_type = 's';
+    token.line = current_line;
     return token;
   }
 
@@ -272,6 +285,7 @@ Token get_next_token(const char *input, int *pos) {
       token.lexeme[0] = c;
       token.lexeme[1] = '\0';
       (*pos)++;
+      token.line = current_line;
       return token;
     }
     token.type = TOKEN_OPERATOR;
@@ -279,11 +293,11 @@ Token get_next_token(const char *input, int *pos) {
     token.lexeme[1] = '\0';
     last_token_type = 'o';
     (*pos)++;
+    token.line = current_line;
     return token;
   }
 
   // TODO: Add delimiter handling here
-
   if (c == '{' || c == '}' || c == '[' || c == ']' || c == ',' || c == '(' ||
       c == ')' || c == ';') {
     token.lexeme[0] = c;
@@ -299,6 +313,7 @@ Token get_next_token(const char *input, int *pos) {
   token.lexeme[0] = c;
   token.lexeme[1] = '\0';
   (*pos)++;
+  token.line = current_line;
   return token;
 }
 
