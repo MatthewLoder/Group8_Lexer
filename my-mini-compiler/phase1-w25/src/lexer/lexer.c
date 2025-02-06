@@ -16,8 +16,11 @@ void print_error(ErrorType error, int line, const char *lexeme) {
   case ERROR_INVALID_CHAR:
     printf("Invalid character '%s'\n", lexeme);
     break;
-  case ERROR_INVALID_NUMBER:
+  case ERROR_INVALID_NUMBER_FORMAT:
     printf("Invalid number format\n");
+    break;
+  case ERROR_INVALID_NUMBER_SIZE:
+    printf("Invalid number size (needs to be within %d to %d)\n", MIN_NUMBER_SIZE, MAX_NUMBER_SIZE);
     break;
   case ERROR_CONSECUTIVE_OPERATORS:
     printf("Consecutive operators not allowed\n");
@@ -173,11 +176,21 @@ Token get_next_token(const char *input, int *pos) {
         c = input[*pos];
         
         //check for invalid character in number
-        if (!isdigit(c) && c != '\n' && c != ';' && c != '\t'  && c != ' ' && c != '\0' && c != '+' && c != '-' && c != '*' && c != '/' && c != '&' && c != '|' && c != '%' && c != '=') token.error = ERROR_INVALID_NUMBER;
+        if (!isdigit(c) && c != '\n' && c != ';' && c != '\t'  && c != ' ' && c != '\0' && c != '+' && c != '-' && c != '*' && c != '/' && c != '&' && c != '|' && c != '%' && c != '=') token.error = ERROR_INVALID_NUMBER_FORMAT;
 
-      } while (((token.error == ERROR_NONE && isdigit(c)) || (token.error == ERROR_INVALID_NUMBER && c != '\n' && c != ';' && c != '\t' && c != ' ' && c != '+' && c != '-' && c != '*' && c != '/' && c != '&' && c != '|' && c != '%' && c != '=')) && i < sizeof(token.lexeme) - 1);
+      } while (((token.error == ERROR_NONE && isdigit(c)) || (token.error == ERROR_INVALID_NUMBER_FORMAT && c != '\n' && c != ';' && c != '\t' && c != ' ' && c != '+' && c != '-' && c != '*' && c != '/' && c != '&' && c != '|' && c != '%' && c != '=')) && i < sizeof(token.lexeme) - 1);
 
       token.lexeme[i] = '\0';
+
+      if (token.error == ERROR_NONE) {
+        int number = atoi(token.lexeme);
+
+        if (number < MIN_NUMBER_SIZE || number > MAX_NUMBER_SIZE) {
+          token.error = ERROR_INVALID_NUMBER_SIZE;
+        }
+
+      }
+      
       token.type = TOKEN_NUMBER;
       last_token_type = 'n';
       return token;

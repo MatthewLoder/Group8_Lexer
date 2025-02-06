@@ -6,6 +6,9 @@
 #ifndef TOKENS_H
 #define TOKENS_H
 
+#define MAX_NUMBER_SIZE 32767
+#define MIN_NUMBER_SIZE -32768
+
 /* Token types that need to be recognized by the lexer
  * TODO: Add more token types as per requirements:
  * - Keywords or reserved words (if, repeat, until)
@@ -33,7 +36,8 @@ typedef enum {
 typedef enum {
   ERROR_NONE,
   ERROR_INVALID_CHAR,
-  ERROR_INVALID_NUMBER,
+  ERROR_INVALID_NUMBER_SIZE,
+  ERROR_INVALID_NUMBER_FORMAT,
   ERROR_CONSECUTIVE_OPERATORS,
   ERROR_UNTERMINATED_STRING,
   ERROR_UNEXPECTED_CHARACTER,
