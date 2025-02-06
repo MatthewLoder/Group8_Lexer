@@ -113,9 +113,7 @@ Token get_next_token(const char *input, int *pos) {
   }
 
   // Multi-Line Comments
-  // Multi-Line Comments
-  if (c == '/' && input[*pos + 1] == '*') // Check if start of comment
-  {
+  if (c == '/' && input[*pos + 1] == '*') {
     int i = 0;
 
     token.lexeme[i++] = c;
