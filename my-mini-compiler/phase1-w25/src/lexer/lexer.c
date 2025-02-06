@@ -136,12 +136,12 @@ Token get_next_token(const char *input, int *pos) {
     } while (!((c == '*' && input[*pos] == '/')) && *pos < strlen(input) - 1);
 
     if (i < sizeof(token.lexeme) - 1) {
-      token.lexeme[i++] = input[*pos]; // '*'
+      token.lexeme[i++] = input[*pos];
     }
     (*pos)++;
 
     if (i < sizeof(token.lexeme) - 1) {
-      token.lexeme[i++] = input[*pos]; // '/'
+      token.lexeme[i++] = input[*pos];
     }
     (*pos)++;
 
