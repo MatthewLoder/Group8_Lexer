@@ -208,14 +208,19 @@ Token get_next_token(const char *input, int *pos) {
       token.lexeme[i++] = c;
       (*pos)++;
       c = input[*pos];
-      if (i > sizeof(token.lexeme) - 2 || c == '\0') {
+      
+      //adjust for extra quotation
+      if (i > sizeof(token.lexeme) || c == '\0') {
         token.error = ERROR_UNTERMINATED_STRING;
         *(pos)--;
         break;
       }
     } while (c != '\"');
 
-    token.lexeme[i++] = c;
+    if (c == '\"') {
+      token.lexeme[i++] = c;
+    }
+    
     (*pos)++;
     c = input[*pos];
     token.lexeme[i] = '\0';
