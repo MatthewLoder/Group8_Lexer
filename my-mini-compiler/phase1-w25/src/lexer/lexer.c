@@ -212,6 +212,14 @@ Token get_next_token(const char *input, int *pos) {
 
   // TODO: Add delimiter handling here
 
+  if (c == '{' || c == '}') {
+    token.lexeme[0] = c;
+    (*pos)++;
+    c = input[*pos];
+    token.type = TOKEN_DELIMITER;
+    return token;
+  }
+
   // Handle invalid characters
   token.error = ERROR_INVALID_CHAR;
   token.lexeme[0] = c;
@@ -231,7 +239,7 @@ int main() {
   // Test comments, keywords, identifiers
   // const char *input =
   //"// This is a comment \n /* Multi-line \n comment */ int x";
-  const char *input = "\"this is a test\"";
+  const char *input = "\"this is a test\"{}";
 
   int position = 0;
   Token token;
