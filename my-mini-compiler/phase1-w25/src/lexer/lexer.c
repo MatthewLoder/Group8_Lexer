@@ -130,11 +130,20 @@ Token get_next_token(const char *input, int *pos) {
   // Handle numbers
   if (isdigit(c)) {
     int i = 0;
+
     do {
       token.lexeme[i++] = c;
       (*pos)++;
       c = input[*pos];
-    } while (isdigit(c) && i < sizeof(token.lexeme) - 1);
+      
+      //check for invalid character in number
+      if (!isdigit(c) && c != '\n' && c != ';' && c != '\t'  && c != ' ') token.error = ERROR_INVALID_NUMBER;
+
+    } while (((token.error == ERROR_NONE && isdigit(c)) || (token.error == ERROR_INVALID_NUMBER && c != '\n' && c != ';' && c != '\t' && c != ' ')) && i < sizeof(token.lexeme) - 1);
+
+    printf("i: %d\n", i);
+    printf("%ld\n",sizeof(token.lexeme) - 1);
+
 
     token.lexeme[i] = '\0';
     token.type = TOKEN_NUMBER;
@@ -221,12 +230,6 @@ Token get_next_token(const char *input, int *pos) {
     return token;
   }
 
-  //ignore carriage return (on windows)
-  if  (c == '\r') {
-    (*pos)++;
-    return get_next_token(input, pos);
-  }
-
   // Handle invalid characters
   token.error = ERROR_INVALID_CHAR;
   token.lexeme[0] = c;
@@ -283,8 +286,17 @@ int main() {
   size_t bytes_read = fread(buffer, 1, file_size, file);
   buffer[bytes_read] = '\0';
 
+  //drop and ignore carriage return (on windows)
+  size_t j = 0;
+  for (size_t i = 0; i < bytes_read; i++) {
+      if (buffer[i] != '\r') {
+          buffer[j++] = buffer[i];
+      }
+  }
+
   print_raw(buffer);
   
+
   int position = 0;
   Token token;
   
@@ -296,10 +308,7 @@ int main() {
     token = get_next_token(buffer, &position);
     print_token(token);
     //printf("%d\n", i++);
-    // return 0;
   } while (token.type != TOKEN_EOF);
-
-  printf("------------------------------------\n");
 
 fclose(file);
   return 0;
