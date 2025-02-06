@@ -193,7 +193,7 @@ Token get_next_token(const char *input, int *pos) {
   }
 
   // Handle operators
-  if (c == '+' || c == '-') {
+  if (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c == '|' || c == '%') {
     if (last_token_type == 'o') {
       // Check for consecutive operators
       token.error = ERROR_CONSECUTIVE_OPERATORS;
@@ -212,7 +212,7 @@ Token get_next_token(const char *input, int *pos) {
 
   // TODO: Add delimiter handling here
 
-  if (c == '{' || c == '}') {
+  if (c == '{' || c == '}' || c == '[' || c == ']' || c == ','|| c == '(' || c == ')' || c == ';') {
     token.lexeme[0] = c;
     (*pos)++;
     c = input[*pos];
