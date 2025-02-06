@@ -25,6 +25,9 @@ void print_error(ErrorType error, int line, const char *lexeme) {
   case ERROR_UNTERMINATED_STRING:
     printf("Unterminated string literal\n");
     break;
+  case ERROR_IDENTIFIER_TOO_LONG:
+    printf("Identifier name too long\n");
+    break;
   default:
     printf("Unknown error\n");
   }
@@ -109,6 +112,7 @@ Token get_next_token(const char *input, int *pos) {
 
     token.lexeme[i] = '\0';
     token.type = TOKEN_COMMENT;
+    last_token_type = 'c';
     return token;
   }
 
@@ -146,27 +150,38 @@ Token get_next_token(const char *input, int *pos) {
     token.lexeme[i] = '\0';
 
     token.type = TOKEN_COMMENT;
+    last_token_type = 'c';
 
     return token;
   }
 
   // Handle numbers
-  if (isdigit(c)) {
+  if (isdigit(c) || c == '-') {
     int i = 0;
+    int isOperator = 0;
 
-    do {
-      token.lexeme[i++] = c;
-      (*pos)++;
-      c = input[*pos];
-      
-      //check for invalid character in number
-      if (!isdigit(c) && c != '\n' && c != ';' && c != '\t'  && c != ' ') token.error = ERROR_INVALID_NUMBER;
+    //check if number hyphen is an operator or part of a number
+    if (c == '-') {
+      token.lexeme[i + 1] = c;
+      if (!isdigit(input[(*pos) + 1])) isOperator = 1;
+    }
 
-    } while (((token.error == ERROR_NONE && isdigit(c)) || (token.error == ERROR_INVALID_NUMBER && c != '\n' && c != ';' && c != '\t' && c != ' ')) && i < sizeof(token.lexeme) - 1);
+    if (!isOperator) {
+      do {
+        token.lexeme[i++] = c;
+        (*pos)++;
+        c = input[*pos];
+        
+        //check for invalid character in number
+        if (!isdigit(c) && c != '\n' && c != ';' && c != '\t'  && c != ' ' && c != '\0' && c != '+' && c != '-' && c != '*' && c != '/' && c != '&' && c != '|' && c != '%' && c != '=') token.error = ERROR_INVALID_NUMBER;
 
-    token.lexeme[i] = '\0';
-    token.type = TOKEN_NUMBER;
-    return token;
+      } while (((token.error == ERROR_NONE && isdigit(c)) || (token.error == ERROR_INVALID_NUMBER && c != '\n' && c != ';' && c != '\t' && c != ' ' && c != '+' && c != '-' && c != '*' && c != '/' && c != '&' && c != '|' && c != '%' && c != '=')) && i < sizeof(token.lexeme) - 1);
+
+      token.lexeme[i] = '\0';
+      token.type = TOKEN_NUMBER;
+      last_token_type = 'n';
+      return token;
+    }
   }
 
   // TODO: Add keyword and identifier handling here
@@ -177,9 +192,12 @@ Token get_next_token(const char *input, int *pos) {
       token.lexeme[i++] = c;
       (*pos)++;
       c = input[*pos];
-    } while ((isalnum(c) || c == '_') &&
-             i < sizeof(token.lexeme) - 1); // keep going as long as we're still
+    } while ((isalnum(c) || c == '_') && i < sizeof(token.lexeme) - 1); // keep going as long as we're still
                                             // finding letters or underscores
+
+    if (i == sizeof(token.lexeme) - 1) {
+      token.error = ERROR_IDENTIFIER_TOO_LONG;
+    }
 
     token.lexeme[i] = '\0';
 
@@ -193,8 +211,10 @@ Token get_next_token(const char *input, int *pos) {
         strcmp(token.lexeme, "return") == 0 ||
         strcmp(token.lexeme, "int") == 0) {
       token.type = TOKEN_KEYWORD;
+      token.type = last_token_type = 'k';
     } else {
       token.type = TOKEN_IDENTIFIER;
+      last_token_type = 'i';
     }
 
     return token;
@@ -209,8 +229,8 @@ Token get_next_token(const char *input, int *pos) {
       (*pos)++;
       c = input[*pos];
       
-      //adjust for extra quotation
-      if (i > sizeof(token.lexeme) || c == '\0') {
+      //adjust for extra quotation, max string length is 98 + 2 quotations
+      if (i > sizeof(token.lexeme) - 2 || c == '\0') {
         token.error = ERROR_UNTERMINATED_STRING;
         *(pos)--;
         break;
@@ -225,6 +245,7 @@ Token get_next_token(const char *input, int *pos) {
     c = input[*pos];
     token.lexeme[i] = '\0';
     token.type = TOKEN_STRING;
+    last_token_type = 's';
     return token;
   }
 
@@ -255,6 +276,7 @@ Token get_next_token(const char *input, int *pos) {
     (*pos)++;
     c = input[*pos];
     token.type = TOKEN_DELIMITER;
+    last_token_type = 'd';
     return token;
   }
 
