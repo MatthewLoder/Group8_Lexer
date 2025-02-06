@@ -164,10 +164,6 @@ Token get_next_token(const char *input, int *pos) {
 
     } while (((token.error == ERROR_NONE && isdigit(c)) || (token.error == ERROR_INVALID_NUMBER && c != '\n' && c != ';' && c != '\t' && c != ' ')) && i < sizeof(token.lexeme) - 1);
 
-    printf("i: %d\n", i);
-    printf("%ld\n",sizeof(token.lexeme) - 1);
-
-
     token.lexeme[i] = '\0';
     token.type = TOKEN_NUMBER;
     return token;
@@ -212,8 +208,9 @@ Token get_next_token(const char *input, int *pos) {
       token.lexeme[i++] = c;
       (*pos)++;
       c = input[*pos];
-      if (i > 98) {
+      if (i > sizeof(token.lexeme) - 2 || c == '\0') {
         token.error = ERROR_UNTERMINATED_STRING;
+        *(pos)--;
         break;
       }
     } while (c != '\"');
@@ -328,10 +325,10 @@ int main() {
           buffer[j++] = buffer[i];
       }
   }
+  buffer[j] = '\0';
 
   print_raw(buffer);
   
-
   int position = 0;
   Token token;
 
@@ -347,4 +344,4 @@ int main() {
 
 fclose(file);
   return 0;
-}
+} 
