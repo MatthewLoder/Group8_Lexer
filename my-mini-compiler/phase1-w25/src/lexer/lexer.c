@@ -251,7 +251,7 @@ Token get_next_token(const char *input, int *pos) {
 
   // Handle operators
   if (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c == '|' ||
-      c == '%' || c == '=') {
+      c == '%' || c == '=' || c == '!') {
     if (last_token_type == 'o') {
       // Check for consecutive operators
       token.error = ERROR_CONSECUTIVE_OPERATORS;
