@@ -101,7 +101,8 @@ Token get_next_token(const char *input, int *pos) {
       input[*pos + 1] == '/') // check if the first 2 characters are //
   {
     while (input[*pos] != '\n' &&
-           input[*pos] != '\0') // until we find a new line character, or null character
+           input[*pos] !=
+               '\0') // until we find a new line character, or null character
     {
       (*pos)++; // keep skipping contents
     }
@@ -161,8 +162,7 @@ Token get_next_token(const char *input, int *pos) {
         strcmp(token.lexeme, "until") == 0 ||
         strcmp(token.lexeme, "else") == 0 ||
         strcmp(token.lexeme, "while") == 0 ||
-        strcmp(token.lexeme, "for") == 0 || 
-        strcmp(token.lexeme, "do") == 0 ||
+        strcmp(token.lexeme, "for") == 0 || strcmp(token.lexeme, "do") == 0 ||
         strcmp(token.lexeme, "return") == 0 ||
         strcmp(token.lexeme, "int") == 0) {
       token.type = TOKEN_KEYWORD;
@@ -181,20 +181,23 @@ Token get_next_token(const char *input, int *pos) {
       token.lexeme[i++] = c;
       (*pos)++;
       c = input[*pos];
+      if (i > 98) {
+        token.error = ERROR_UNTERMINATED_STRING;
+        break;
+      }
     } while (c != '\"');
 
     token.lexeme[i++] = c;
     (*pos)++;
     c = input[*pos];
-
     token.lexeme[i] = '\0';
-
     token.type = TOKEN_STRING;
     return token;
   }
 
   // Handle operators
-  if (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c == '|' || c == '%' || c == '=') {
+  if (c == '+' || c == '-' || c == '*' || c == '/' || c == '&' || c == '|' ||
+      c == '%' || c == '=') {
     if (last_token_type == 'o') {
       // Check for consecutive operators
       token.error = ERROR_CONSECUTIVE_OPERATORS;
@@ -213,7 +216,8 @@ Token get_next_token(const char *input, int *pos) {
 
   // TODO: Add delimiter handling here
 
-  if (c == '{' || c == '}' || c == '[' || c == ']' || c == ','|| c == '(' || c == ')' || c == ';') {
+  if (c == '{' || c == '}' || c == '[' || c == ']' || c == ',' || c == '(' ||
+      c == ')' || c == ';') {
     token.lexeme[0] = c;
     (*pos)++;
     c = input[*pos];
@@ -221,8 +225,8 @@ Token get_next_token(const char *input, int *pos) {
     return token;
   }
 
-  //ignore carriage return (on windows)
-  if  (c == '\r') {
+  // ignore carriage return (on windows)
+  if (c == '\r') {
     (*pos)++;
     return get_next_token(input, pos);
   }
@@ -237,14 +241,23 @@ Token get_next_token(const char *input, int *pos) {
 
 void print_raw(const char *buffer) {
   while (*buffer) {
-      switch (*buffer) {
-          case '\n': printf("\\n"); break;
-          case '\t': printf("\\t"); break;
-          case '\r': printf("\\r"); break;
-          case '\0': printf("\\0"); break;
-          default: putchar(*buffer);
-      }
-      buffer++;
+    switch (*buffer) {
+    case '\n':
+      printf("\\n");
+      break;
+    case '\t':
+      printf("\\t");
+      break;
+    case '\r':
+      printf("\\r");
+      break;
+    case '\0':
+      printf("\\0");
+      break;
+    default:
+      putchar(*buffer);
+    }
+    buffer++;
   }
   printf("\n\n");
 }
@@ -263,31 +276,31 @@ int main() {
 
   FILE *file = fopen("../../test/input_invalid.txt", "r");
   if (file == NULL) {
-        printf("Error opening file\n");
-        return 1; 
-    }
-  
-  //get file size
+    printf("Error opening file\n");
+    return 1;
+  }
+
+  // get file size
   fseek(file, 0, SEEK_END);
   long file_size = ftell(file);
   rewind(file);
-    
-  //get buffer sizes
+
+  // get buffer sizes
   char *buffer = malloc(file_size + 1);
-    if (!buffer) {
-      printf("Memory allocation failed.\n");
-      fclose(file);
-      return 1;
+  if (!buffer) {
+    printf("Memory allocation failed.\n");
+    fclose(file);
+    return 1;
   }
 
   size_t bytes_read = fread(buffer, 1, file_size, file);
   buffer[bytes_read] = '\0';
 
   print_raw(buffer);
-  
+
   int position = 0;
   Token token;
-  
+
   printf("Analyzing input:\n%s\n\n", buffer);
 
   int i = 0;
@@ -295,12 +308,12 @@ int main() {
   do {
     token = get_next_token(buffer, &position);
     print_token(token);
-    //printf("%d\n", i++);
-    // return 0;
+    // printf("%d\n", i++);
+    //  return 0;
   } while (token.type != TOKEN_EOF);
 
   printf("------------------------------------\n");
 
-fclose(file);
+  fclose(file);
   return 0;
 }
