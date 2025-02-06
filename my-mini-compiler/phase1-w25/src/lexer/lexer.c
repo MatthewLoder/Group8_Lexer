@@ -19,8 +19,8 @@ void print_error(ErrorType error, int line, const char *lexeme) {
   case ERROR_INVALID_NUMBER_FORMAT:
     printf("Invalid number format\n");
     break;
-  case ERROR_INVALID_NUMBER_SIZE:
-    printf("Invalid number size (needs to be within %d to %d)\n", MIN_NUMBER_SIZE, MAX_NUMBER_SIZE);
+  case ERROR_INVALID_NUMBER_VALUE:
+    printf("Invalid number value (needs to be within %d to %d)\n", MIN_NUMBER_SIZE, MAX_NUMBER_SIZE);
     break;
   case ERROR_CONSECUTIVE_OPERATORS:
     printf("Consecutive operators not allowed\n");
@@ -186,7 +186,7 @@ Token get_next_token(const char *input, int *pos) {
         int number = atoi(token.lexeme);
 
         if (number < MIN_NUMBER_SIZE || number > MAX_NUMBER_SIZE) {
-          token.error = ERROR_INVALID_NUMBER_SIZE;
+          token.error = ERROR_INVALID_NUMBER_VALUE;
         }
 
       }
