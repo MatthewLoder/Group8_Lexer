@@ -172,8 +172,6 @@ Token get_next_token(const char *input, int *pos) {
     return token;
   }
 
-  int y = 1;
-
   // TODO: Add string literal handling here
   if (c == '\"') {
     int i = 0;
