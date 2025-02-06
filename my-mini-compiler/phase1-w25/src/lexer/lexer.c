@@ -239,21 +239,31 @@ int main() {
   // Test comments, keywords, identifiers
   // const char *input =
   //"// This is a comment \n /* Multi-line \n comment */ int x";
-  const char *input = "\"this is a test\"{}";
 
-  int position = 0;
-  Token token;
+  FILE *file = fopen("../../test/input_invalid.txt", "r");
+  if (file == NULL) {
+        printf("Error opening file\n");
+        return 1; 
+    }
+  printf("test");
+  char buffer[256];
+  while (fgets(buffer, sizeof(buffer), file) != NULL) {
+    int position = 0;
+    Token token;
+    
+    printf("Analyzing input:\n%s\n\n", buffer);
 
-  printf("Analyzing input:\n%s\n\n", input);
+    int i = 0;
 
-  int i = 0;
+    do {
+      token = get_next_token(buffer, &position);
+      print_token(token);
+      printf("%d\n", i++);
+      // return 0;
+    } while (token.type != TOKEN_EOF);
+  }
 
-  do {
-    token = get_next_token(input, &position);
-    print_token(token);
-    printf("%d\n", i++);
-    // return 0;
-  } while (token.type != TOKEN_EOF);
+fclose(file);
 
   return 0;
 }
