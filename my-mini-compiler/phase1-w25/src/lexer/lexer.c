@@ -100,32 +100,56 @@ Token get_next_token(const char *input, int *pos) {
   if (c == '/' &&
       input[*pos + 1] == '/') // check if the first 2 characters are //
   {
-    while (input[*pos] != '\n' &&
-           input[*pos] !=
-               '\0') // until we find a new line character, or null character
-    {
-      (*pos)++; // keep skipping contents
-    }
-    last_token_type = 'C'; // Mark as comment
-    return get_next_token(input, pos);
+    int i = 0;
+    do {
+      token.lexeme[i++] = c;
+      (*pos)++;
+      c = input[*pos];
+    } while (c != '\n' && i < sizeof(token.lexeme) - 1);
+
+    token.lexeme[i] = '\0';
+    token.type = TOKEN_COMMENT;
+    return token;
   }
 
   // Multi-Line Comments
-  if (c == '/' && input[*pos + 1] == '*') // check ig first 2 characters are /*
+  // Multi-Line Comments
+  if (c == '/' && input[*pos + 1] == '*') // Check if start of comment
   {
-    (*pos) += 2;
-    while (input[*pos] != '\0' &&
-           !(input[*pos] == '*' &&
-             input[*pos + 1] == '/')) // until we find the closing */
-    {
-      if (input[*pos] == '\n')
-        current_line++; // keep skipping contents
+    int i = 0;
+
+    token.lexeme[i++] = c;
+    (*pos)++;
+    c = input[*pos];
+    token.lexeme[i++] = c;
+    (*pos)++;
+
+    do {
+      c = input[*pos];
+
+      if (i < sizeof(token.lexeme) - 1) {
+        token.lexeme[i++] = c;
+      }
+
       (*pos)++;
+
+    } while (!((c == '*' && input[*pos] == '/')) && *pos < strlen(input) - 1);
+
+    if (i < sizeof(token.lexeme) - 1) {
+      token.lexeme[i++] = input[*pos]; // '*'
     }
-    if (input[*pos] == '*' && input[*pos + 1] == '/')
-      (*pos) += 2;
-    last_token_type = 'C'; // Mark as comment
-    return get_next_token(input, pos);
+    (*pos)++;
+
+    if (i < sizeof(token.lexeme) - 1) {
+      token.lexeme[i++] = input[*pos]; // '/'
+    }
+    (*pos)++;
+
+    token.lexeme[i] = '\0';
+
+    token.type = TOKEN_COMMENT;
+
+    return token;
   }
 
   // Handle numbers
