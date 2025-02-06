@@ -223,7 +223,7 @@ Token get_next_token(const char *input, int *pos) {
         strcmp(token.lexeme, "for") == 0 || 
         strcmp(token.lexeme, "do") == 0 ||
         strcmp(token.lexeme, "return") == 0 ||
-        strcmp(token.lexeme, "int\0") == 0) {
+        strcmp(token.lexeme, "int") == 0) {
       token.type = TOKEN_KEYWORD;
       last_token_type = 'k';
     } else {
